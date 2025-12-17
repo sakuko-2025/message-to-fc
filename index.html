@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lời nhắn gửi từ hậu phương BO</title>
+    <!-- Nhúng font chữ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <!-- Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* --- 1. CÀI ĐẶT MÀU SẮC (THEME NAVY - PINK - WHITE) --- */
+        :root {
+            --bg-navy: #1a2639;       /* Xanh Navy đậm */
+            --accent-pink: #ff99c8;   /* Hồng pastel */
+            --accent-hot-pink: #ef476f; /* Hồng đậm */
+            --paper-white: #ffffff;   /* Trắng */
+            --text-navy: #1a2639;     /* Chữ xanh */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-navy);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
+            font-family: 'Patrick Hand', cursive;
+            height: 100vh;
+            height: 100dvh; /* Hỗ trợ mobile browser */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-navy);
+        }
+
+        /* --- 2. KHUNG SLIDE --- */
+        .slider-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid var(--paper-white);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Sticker trang trí */
+        .bg-deco {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.8;
+            z-index: 1;
+            animation: float 4s ease-in-out infinite;
+        }
+        .deco-1 { top: 20px; left: 20px; color: var(--accent-pink); }
+        .deco-2 { bottom: 20px; right: 20px; color: var(--paper-white); animation-delay: 2s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 2;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        /* --- 3. BỐ CỤC NỘI DUNG (RESPONSIVE) --- */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1000px;
+            align-items: center;
+            /* Thêm scroll cho mobile */
+            height: 100%;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        /* Ẩn thanh cuộn */
+        .two-columns::-webkit-scrollbar { width: 0; height: 0; }
+
+        .member-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin: auto;
+        }
+
+        /* Khung ảnh Polaroid */
+        .photo-frame {
+            background: var(--paper-white);
+            padding: 12px 12px 50px 12px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
+            transform: rotate(-2deg);
+            transition: transform 0.3s;
+            width: 300px;
+            max-width: 100%;
+            border-radius: 4px;
+        }
+        
+        .member-card:hover .photo-frame {
+            transform: rotate(0deg) scale(1.03);
+            z-index: 5;
+            box-shadow: 12px 12px 0px rgba(255, 153, 200, 0.4);
+        }
+        
+        .member-card:nth-child(2) .photo-frame { transform: rotate(2deg); }
+        .member-card:nth-child(2):hover .photo-frame { transform: rotate(0deg) scale(1.03); }
+
+        .photo-frame img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 2px;
+            border: 1px solid #eee;
+        }
+
+        .photo-caption {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-family: 'Mali', cursive;
+            font-weight: 700;
+            color: var(--text-navy);
+            font-size: 1.2rem;
+        }
+
+        /* Băng dính Hồng */
+        .tape-strip {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 30px;
+            background-color: var(--accent-pink);
+            opacity: 0.9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+            border-left: 2px dashed rgba(255,255,255,0.4);
+            border-right: 2px dashed rgba(255,255,255,0.4);
+        }
+
+        /* Lời nhắn */
+        .message-note {
+            background-color: var(--paper-white);
+            padding: 15px 20px;
+            width: 360px;
+            max-width: 100%; /* Đảm bảo không tràn màn hình nhỏ */
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            transform: rotate(1deg);
+            border: 2px dashed var(--bg-navy);
+        }
+
+        .message-note::before {
+            content: '❤';
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 24px;
+            color: var(--accent-hot-pink);
+            transform: rotate(15deg);
+        }
+
+        .message-note h3 {
+            font-family: 'Mali', cursive;
+            font-size: 20px;
+            color: var(--accent-hot-pink);
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .message-note p {
+            font-size: 17px;
+            line-height: 1.4;
+            color: var(--text-navy);
+        }
+
+        /* --- 4. NAVIGATION BUTTONS (RESPONSIVE) --- */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--accent-pink);
+            color: var(--bg-navy);
+            border: 3px solid var(--paper-white);
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: grid;
+            place-items: center;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--paper-white);
+            color: var(--accent-hot-pink);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .prev-btn { left: 25px; }
+        .next-btn { right: 25px; }
+
+        /* --- 5. TRANG TIÊU ĐỀ --- */
+        .title-content {
+            text-align: center;
+            color: var(--paper-white);
+            background: rgba(26, 38, 57, 0.8);
+            padding: 40px 60px;
+            border-radius: 20px;
+            border: 3px solid var(--accent-pink);
+            box-shadow: 10px 10px 0px var(--accent-pink);
+            max-width: 90%; /* Responsive width */
+        }
+        
+        .title-content h1 {
+            font-family: 'Mali', cursive;
+            font-size: clamp(40px, 8vw, 70px); /* Tự động co giãn font */
+            color: var(--paper-white);
+            text-shadow: 3px 3px 0px var(--accent-hot-pink);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .title-content .subtitle {
+            font-size: clamp(20px, 5vw, 28px);
+            color: var(--accent-pink);
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 768px) {
+            /* Full màn hình cho mobile */
+            .slider-container {
+                width: 100%;
+                height: 100%;
+                border: none;
+                border-radius: 0;
+            }
+
+            /* Chuyển cột thành hàng dọc */
+            .two-columns {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 20px;
+                padding-bottom: 80px; /* Chừa chỗ cho nút bên dưới */
+                gap: 40px;
+            }
+
+            /* Card nhỏ lại xíu để vừa màn hình */
+            .member-card { width: 95%; }
+            .photo-frame { width: 280px; }
+            .message-note { width: 290px; }
+
+            /* Đưa nút điều hướng xuống đáy màn hình */
+            .nav-btn {
+                top: auto;
+                bottom: 20px;
+                transform: none;
+                width: 50px;
+                height: 50px;
+                background-color: rgba(255, 153, 200, 0.9); /* Làm mờ chút */
+            }
+            .nav-btn:hover { transform: none; }
+            .prev-btn { left: 30%; }
+            .next-btn { right: 30%; }
+
+            /* Ẩn sticker nền nếu rối mắt */
+            .bg-deco { opacity: 0.3; font-size: 30px; }
+            
+            .title-content { padding: 30px 20px; }
+            .title-content i { font-size: 50px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slider-container">
+        
+        <!-- Sticker trang trí chung -->
+        <i class="fa-solid fa-star bg-deco deco-1"></i>
+        <i class="fa-solid fa-heart bg-deco deco-2"></i>
+
+        <!-- === SLIDE 1: TRANG BÌA === -->
+        <div class="slide active">
+            <div class="title-content">
+                <i class="fa-solid fa-camera-retro" style="font-size: 80px; margin-bottom: 20px; color: var(--accent-pink);"></i>
+                <h1>Lời nhắn gửi</h1>
+                <div class="subtitle">- From: Nhóm 1 -</div>
+                <p style="font-size: 22px;">"Cải tiến liên tục, 1% mỗi ngày"</p>
+                <div style="margin-top: 30px; color: var(--accent-pink);">
+                    <i class="fa-solid fa-heart"></i>
+                    <i class="fa-solid fa-heart"></i>
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SLIDE 2: THÀNH VIÊN 1 & 2 === -->
+        <div class="slide">
+            <div class="two-columns">
+                <!-- Người 1 -->
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/vkunn5ealxcmegk3vklln/VTDH.jpg?rlkey=kl6h2m0rpz0g9imlnxfn7qtk4&st=fng7frqp&dl=1" alt="Thành viên 1">
+                        <div class="photo-caption">Vũ Thị Diệu Huyền</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Mình là Diệu Huyền – phòng Ngành hàng.
+                            Xin gửi lời biết ơn Siêu thị tiền tuyến đã luôn "chiến" hết mình mỗi ngày. Hậu phương phía sau chúng mình luôn nỗ lực để hàng hóa đủ – đúng – chất lượng, cùng Siêu thị phục vụ khách hàng tốt hơn mỗi ngày.
+                            Chúng mình cùng là một team, cùng nhau cố gắng nhé 💪"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Người 2 -->
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/q5ve0tmxc19p06mib5yri/NVT.jpg?rlkey=jdn2nye33ndt4lzhvnw95cbov&st=mkbu5f82&dl=1" alt="Thành viên 2">
+                        <div class="photo-caption">Nông Văn Thắng</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Mình là Thắng p.Marketing - gửi bức thư này từ đầu cầu BO tại Hà Nội. 
+                        Vậy là sắp Tết rồi đúng không cả nhà? Chúng ta cố gắng cả năm vì một cái Tết ấm no và đủ đầy, 
+                        nhưng hơn hết vẫn là tinh thần vượt qua khó khăn và cùng nhau đạt mục tiêu. 
+                        Hướng đến những giá trị thực tế, vì vậy mỗi sự nỗ lực, mỗi sự cải tiến của chúng ta đều đáng trân trọng! Hãy cố lên nhé các chiến binh, chúng ta sẽ cùng nhau chiến thắng!!!!"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SLIDE 3: THÀNH VIÊN 3 & 4 === -->
+        <div class="slide">
+            <div class="two-columns">
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/05sash37k789bb275s5zy/DTBH.png?rlkey=rtf35j08x4obt6ftb3c97emxg&st=dkgfnf64&dl=1" alt="Thành viên 3">
+                        <div class="photo-caption">Đào Thị Bảo Hân</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Em là Bảo Hân phòng HCNS. Chúc các Siêu thị thật nhiều năng lượng 💖, chúc gia đình mình có một ngày làm việc vui vẻ, thuận lợi, năng lượng - khởi sắc và thật nhiều "ting ting" ạ"</p>
+                    </div>
+                </div>
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/9t1x66abvtj7q1g77sju5/TH.jpg?rlkey=iz88akoti42iynmejd75kcwhm&st=a7r3aama&dl=1" alt="Thành viên 4">
+                        <div class="photo-caption">Đồng Thị Huế</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Em là Huế - phòng TCKT ạ, em xin gửi lời chúc đến khối FC thật nhiều sức khoẻ, nhiều năng lượng tích cực, chăm sóc khách hàng tận tâm, nhất là các khách vvvvvip nhé, chúc CH nào cũng đạt target 200% ạ
+Team số 1 luôn đồng hành cùng các bạn nhaaaaa.
+Cố lên 💪✨"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SLIDE 4: THÀNH VIÊN 5 & 6 === -->
+        <div class="slide">
+            <div class="two-columns">
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/x5gwypoatqraxa2fseq0x/HTA.png?rlkey=9jgaymy4y3swc8du3rma0ko4t&st=5vpvqv50&dl=1" alt="Thành viên 5">
+                        <div class="photo-caption">Hà Tài Anh</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Em là Hà Tài Anh - phòng CNTT. Ở tuyến đầu, mọi người là những chiến binh tạo nên từng nụ cười của khách, từng bill đẹp, từng khoảnh khắc đáng tự hào.
+                            Ở phía sau, chúng em luôn dõi theo, cổ vũ và sẵn sàng tiếp sức mọi lúc mọi nơi. Chúc cả nhà luôn giữ vừng năng lượng sẵn sàng như một chiến binh! Khách đến là đón.🔥💛"
+                        </p>
+                    </div>
+                </div>
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/lvb6a0kh6uakgzebtgajc/TPTL.jpg?rlkey=xooxlnjnndw9ktgrxo2s19os7&st=yr2woub0&dl=1" alt="Thành viên 6">
+                        <div class="photo-caption">Trần Phạm Thùy Linh</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Em là Thùy Linh - phòng HCNS. Chúc cả nhà một ngày mới thật rộn ràng, năng lượng, khách ghé đều và tiếng “ting ting”
+                            vang liên tục. Mong team mình vào ca với tinh thần vui vẻ, phối hợp ăn ý để mỗi đơn hàng
+                            trao tay đều mang theo nụ cười và một bill xinh xắn."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SLIDE 5: THÀNH VIÊN 7 & 8 === -->
+        <div class="slide">
+            <div class="two-columns">
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/atlvxxyhezxfbtb3nwrxx/LTKH.png?rlkey=to2ldkk420781ii20i7bujea5&st=krok9v4b&dl=1" alt="Thành viên 7">
+                        <div class="photo-caption">Lê Thị Khánh Huyền</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Em là Huyền - p.Marketing. Chúc các siêu thị một ngày làm việc nhiều năng lượng, phối hợp nhịp nhàng, phục vụ khách hàng thật tốt và lên đơn đều đều.
+                            Hậu phương luôn đồng hành, sẵn sàng hỗ trợ để các siêu thị yên tâm tập trung bán hàng.🔥"
+                        </p>
+                    </div>
+                </div>
+                <div class="member-card">
+                    <div class="photo-frame">
+                        <div class="tape-strip"></div>
+                        <img src="https://www.dropbox.com/scl/fi/fqqfv6buslb6eoct74ynd/NVH.jpg?rlkey=3bkc29gccfj30n426vsed9ynm&st=yq5a4o1d&dl=1" alt="Thành viên 8">
+                        <div class="photo-caption">Nguyễn Việt Hoàng</div>
+                    </div>
+                    <div class="message-note">
+                        <h3>Gửi FC Vinh, Thanh Hóa, Móng Cái, Đồng Hới</h3>
+                        <p>"Mình là Nguyễn Việt Hoàng - p.CNTT, gửi lời cảm ơn chân thành đến toàn bộ khối FC vì sự tận tâm và nhiệt huyết mỗi ngày. Các bạn chính là cầu nối tuyệt vời để khách hàng luôn được chăm sóc tốt nhất. Chúc FC luôn tràn đầy năng lượng tích cực, đạt target 100% và mang đến thật nhiều trải nghiệm tuyệt vời cho khách hàng.
+ Team chúng mình luôn đồng hành cùng FC nhé! Cố lên nào. 💪🔥"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === SLIDE 6: KẾT THÚC === -->
+        <div class="slide">
+            <div class="title-content" style="background: var(--paper-white); border-color: var(--accent-hot-pink);">
+                <h1 style="color: var(--bg-navy); text-shadow: none; font-size: clamp(30px, 8vw, 60px);">Thank You!</h1>
+                <div style="width: 100%; max-width: 600px; margin: 20px auto; border: 4px solid var(--accent-pink); border-radius: 10px; overflow: hidden;">
+                    <!-- Ảnh tập thể -->
+                    <img src="https://play-lh.googleusercontent.com/_Yl0h23O7d-C8swWKNPnLWBnNi6-cyRNW4kKqgDYALYsyXEvlwJ5lM-SvHQbb5l_DQ=w480-h960-rw" alt="Ảnh tập thể" style="width: 100%; display: block;">
+                </div>
+                <p style="color: var(--bg-navy); margin-top: 20px; font-weight: bold;">Cảm ơn bạn vì không ngừng nỗ lực, cải tiến hàng ngày!</p>
+            </div>
+        </div>
+
+        <!-- NÚT ĐIỀU HƯỚNG -->
+        <button class="nav-btn prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="nav-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+
+    </div>
+
+    <!-- SCRIPT XỬ LÝ CHUYỂN SLIDE -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const nextBtn = document.querySelector('.next-btn');
+        const prevBtn = document.querySelector('.prev-btn');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (index >= slides.length) currentSlide = 0;
+            else if (index < 0) currentSlide = slides.length - 1;
+            else currentSlide = index;
+
+            slides[currentSlide].classList.add('active');
+        }
+
+        nextBtn.addEventListener('click', () => {
+            showSlide(currentSlide + 1);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            showSlide(currentSlide - 1);
+        });
+        
+        // Cho phép dùng phím mũi tên bàn phím
+        document.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowRight") showSlide(currentSlide + 1);
+            if(e.key === "ArrowLeft") showSlide(currentSlide - 1);
+        });
+    </script>
+</body>
+</html>
