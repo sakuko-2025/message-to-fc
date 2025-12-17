@@ -57,6 +57,7 @@
             opacity: 0.8;
             z-index: 1;
             animation: float 4s ease-in-out infinite;
+            pointer-events: none; /* Không che chắn thao tác vuốt */
         }
         .deco-1 { top: 20px; left: 20px; color: var(--accent-pink); }
         .deco-2 { bottom: 20px; right: 20px; color: var(--paper-white); animation-delay: 2s; }
@@ -229,7 +230,45 @@
         .prev-btn { left: 25px; }
         .next-btn { right: 25px; }
 
-        /* --- 5. TRANG TIÊU ĐỀ --- */
+        /* --- 5. NÚT NHẠC (MUSIC BUTTON) --- */
+        .music-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--accent-pink);
+            border: 3px solid var(--paper-white);
+            border-radius: 50%;
+            color: var(--bg-navy);
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--paper-white);
+            color: var(--accent-hot-pink);
+        }
+
+        /* Hiệu ứng xoay khi nhạc phát */
+        .music-btn.playing {
+            animation: spin 3s linear infinite;
+            background-color: var(--paper-white);
+            color: var(--accent-hot-pink);
+            border-color: var(--accent-hot-pink);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- 6. TRANG TIÊU ĐỀ --- */
         .title-content {
             text-align: center;
             color: var(--paper-white);
@@ -270,26 +309,44 @@
                 border-radius: 0;
             }
 
-            /* 2. Vô hiệu hóa slide, chuyển sang xếp chồng (Stack) */
+            /* 2. Fix sticker nền để không bị trôi theo scroll */
+            .bg-deco {
+                position: fixed; /* Ghim vào màn hình */
+                z-index: 0; /* Nằm dưới cùng */
+                opacity: 0.2; /* Mờ hơn để không rối mắt */
+            }
+
+            /* 3. Vô hiệu hóa slide, chuyển sang xếp chồng (Stack) */
             .slide {
-                position: relative; /* Không còn absolute đè lên nhau */
-                opacity: 1 !important; /* Luôn hiển thị */
+                position: relative; 
+                opacity: 1 !important;
                 transform: none !important;
                 top: auto; left: auto;
                 width: 100%;
-                height: auto; /* Chiều cao tự do */
+                height: auto;
                 min-height: auto;
                 display: flex;
                 flex-direction: column;
                 padding: 40px 15px;
                 margin-bottom: 20px;
                 pointer-events: all;
+                z-index: 1; /* Nổi lên trên sticker nền */
             }
 
-            /* 3. Ẩn nút điều hướng */
+            /* 4. Ẩn nút điều hướng */
             .nav-btn { display: none !important; }
+            
+            /* 5. Nút nhạc ghim cố định trên mobile */
+            .music-btn {
+                position: fixed; /* Luôn nổi trên cùng khi cuộn */
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
 
-            /* 4. Điều chỉnh bố cục nội dung */
+            /* 6. Điều chỉnh bố cục nội dung */
             .two-columns {
                 display: flex;
                 flex-direction: column;
@@ -304,12 +361,9 @@
 
             /* Tạo khoảng cách cho trang bìa */
             .slide:first-child {
-                min-height: 80vh; /* Trang bìa chiếm gần hết màn hình đầu */
+                min-height: 80vh; 
                 margin-bottom: 40px;
             }
-
-            /* Ẩn sticker nền đỡ rối */
-            .bg-deco { opacity: 0.3; }
         }
     </style>
 </head>
@@ -317,6 +371,17 @@
 
     <div class="slider-container">
         
+        <!-- Nhạc nền (Ẩn) -->
+        <!-- Bạn có thể thay đổi link nhạc tại đây (src) -->
+        <audio id="bgMusic" loop>
+            <source src="https://www.dropbox.com/scl/fi/t308ogdp2h5eovbv1lure/Aloha-Cool-Piano-Cover-An-Coong.mp3?rlkey=c3i1ryol3r4cajlf2k7vdw02q&st=uxaxazkx&raw=1" type="audio/mp3">
+        </audio>
+
+        <!-- Nút bật/tắt nhạc -->
+        <button class="music-btn" onclick="toggleMusic()" title="Bật/Tắt nhạc">
+            <i class="fa-solid fa-music"></i>
+        </button>
+
         <!-- Sticker trang trí chung -->
         <i class="fa-solid fa-star bg-deco deco-1"></i>
         <i class="fa-solid fa-heart bg-deco deco-2"></i>
@@ -485,8 +550,9 @@ Cố lên 💪✨"</p>
 
     </div>
 
-    <!-- SCRIPT XỬ LÝ CHUYỂN SLIDE -->
+    <!-- SCRIPT XỬ LÝ CHUYỂN SLIDE VÀ NHẠC -->
     <script>
+        // Xử lý chuyển slide
         const slides = document.querySelectorAll('.slide');
         const nextBtn = document.querySelector('.next-btn');
         const prevBtn = document.querySelector('.prev-btn');
@@ -510,11 +576,33 @@ Cố lên 💪✨"</p>
             showSlide(currentSlide - 1);
         });
         
-        // Cho phép dùng phím mũi tên bàn phím
         document.addEventListener('keydown', (e) => {
             if(e.key === "ArrowRight") showSlide(currentSlide + 1);
             if(e.key === "ArrowLeft") showSlide(currentSlide - 1);
         });
+
+        // Xử lý phát nhạc
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.querySelector('.music-btn');
+        let isPlaying = false;
+
+        // Đặt âm lượng vừa phải
+        bgMusic.volume = 0.5;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicBtn.classList.remove('playing');
+                musicBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
+                musicBtn.title = "Bật nhạc";
+            } else {
+                bgMusic.play();
+                musicBtn.classList.add('playing');
+                musicBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                musicBtn.title = "Tắt nhạc";
+            }
+            isPlaying = !isPlaying;
+        }
     </script>
 </body>
 </html>
