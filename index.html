@@ -373,7 +373,7 @@
         
         <!-- Nhạc nền (Ẩn) -->
         <!-- Bạn có thể thay đổi link nhạc tại đây (src) -->
-        <audio id="bgMusic" loop>
+        <audio id="bgMusic" loop autoplay>
             <source src="https://www.dropbox.com/scl/fi/t308ogdp2h5eovbv1lure/Aloha-Cool-Piano-Cover-An-Coong.mp3?rlkey=c3i1ryol3r4cajlf2k7vdw02q&st=uxaxazkx&raw=1" type="audio/mp3">
         </audio>
 
@@ -590,6 +590,18 @@ Cùng nhau cố gắng để tháng này bứt phá và cán đích thật đẹ
         // Đặt âm lượng vừa phải
         bgMusic.volume = 0.5;
 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Thử phát nhạc ngay khi tải trang
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                musicBtn.classList.add('playing');
+                musicBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                musicBtn.title = "Tắt nhạc";
+            }).catch(error => {
+                console.log("Autoplay bị chặn bởi trình duyệt, cần tương tác người dùng.");
+            });
+        });
+        
         function toggleMusic() {
             if (isPlaying) {
                 bgMusic.pause();
@@ -607,6 +619,7 @@ Cùng nhau cố gắng để tháng này bứt phá và cán đích thật đẹ
     </script>
 </body>
 </html>
+
 
 
 
